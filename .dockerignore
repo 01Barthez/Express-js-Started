@@ -7,18 +7,17 @@
 *.so
 
 # Ignore build output directories
-bin/
-build/
-dist/
-keys/
+/bin/
+/build/
+/dist/
+/keys/
 
 # Ignore package manager directories
-node_modules/
-vendor/
+/node_modules/
+/vendor/
 
 # Ignore log files
 *.log
-*.logs
 
 # Ignore temporary files
 *.tmp
