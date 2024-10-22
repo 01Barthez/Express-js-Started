@@ -1,0 +1,6 @@
+{
+    "scripts": {
+      "dev": "ts-node -r tsconfig-paths/register src/app.ts",
+      "start": "ts-node -r tsconfig-paths/register src/app.ts"
+    }
+  }

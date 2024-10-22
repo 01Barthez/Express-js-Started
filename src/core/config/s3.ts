@@ -1,5 +1,6 @@
 import {S3Client} from '@aws-sdk/client-s3'
 import { envs } from './env'
+import log from './logger';
 
 const s3 = new S3Client({
     region: envs.AWS_REGION,
@@ -12,6 +13,6 @@ const s3 = new S3Client({
     endpoint: envs.MIMIO_URL,
     forcePathStyle: true,
 })
-console.log(envs.AWS_BUCKET_NAME)
+log.debug(envs.AWS_BUCKET_NAME)
 
 export default s3;

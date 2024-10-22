@@ -8,6 +8,18 @@ import { Router } from "express"
 
 const objet: Router = Router()
 
+/**
+*@swagger
+* /{id}
+* get
+*  summary: "Get user objet using id"
+*  description: "enter the id of the ressource to get it"
+* responses: 
+*  200: 
+*   description: [objet]
+*  400: 
+*   description: "ressource not found"
+*/
 objet.get(
     ROUTES.OBJET.GET_ONE_objet,
     objetsController.get_one_objet

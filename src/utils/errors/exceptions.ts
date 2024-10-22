@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { HttpCode } from "../../core/constant";
-import logger from "@src/core/config/logger";
+import log from "@src/core/config/logger";
 
 const exceptions = {
     badRequest: (res: Response, msg: string) => {
@@ -29,7 +29,7 @@ const exceptions = {
     },
 
     serverError : (res: Response, error: unknown) => {
-        logger.error('Internal server error', {
+        log.error('Internal server error', {
             message: error instanceof Error ? error.message : "Unknown error occurred",
         });
         res

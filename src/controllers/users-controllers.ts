@@ -40,7 +40,7 @@ const usersControllers = {
                     },
                 }
             });
-            if (!newUser) return exceptions.notFound(res, "Error when creating new user !");
+            if (!newUser) return exceptions.badRequest(res, "Error when creating new user !");
 
             sendMail(
                 newUser.email, // Receiver Email
@@ -105,9 +105,9 @@ const usersControllers = {
     // function for deconnexion of user 
     deconnexion: async (req: customRequest, res: Response) => {
         try {
-            // fetch employeID from authentification
+            // fetch employeID from authentication
             const userID = req.user?.user_id;
-            if (!userID) return exceptions.unauthorized(res, "authentification error !");
+            if (!userID) return exceptions.unauthorized(res, "authentication error !");
 
             // Check if user user exist
             const user = await prisma.user.findUnique({ where: { user_id: userID } })
@@ -159,9 +159,9 @@ const usersControllers = {
     // function to update user 
     updateUserData: async (req: customRequest, res: Response) => {
         try {
-            // fetch employeID from authentification
+            // fetch employeID from authentication
             const userID = req.user?.user_id;
-            if (!userID) return exceptions.unauthorized(res, "authentification error !");
+            if (!userID) return exceptions.unauthorized(res, "authentication error !");
 
             // Check if user user exist
             const user = await prisma.user.findUnique({ where: { user_id: userID } })
@@ -187,7 +187,7 @@ const usersControllers = {
                 data: { name, email },
                 select: { name: true, email: true }
             });
-            if (!updateuser) return exceptions.notFound(res, "error when update user !");
+            if (!updateuser) return exceptions.badRequest(res, "error when update user !");
 
             // Return success message
             res
@@ -201,24 +201,30 @@ const usersControllers = {
     // function to delete user 
     deleteUser: async (req: customRequest, res: Response) => {
         try {
-            // fetch employeID from authentification
+            // fetch UserID from authentication
             const userID = req.user?.user_id;
-            if (!userID) return exceptions.unauthorized(res, "authentification error !");
+            if (!userID) {
+                log.warn("Authentication error: No userID found in request")
+                return exceptions.unauthorized(res, "authentication error !");
+            }
 
-            // Check if user user exist
+            // Check if user exists
             const user = await prisma.user.findUnique({ where: { user_id: userID } })
-            if (!user) return exceptions.badRequest(res, "user not found !");
+            if (!user) {
+                log.warn(`user not found: is it the userID is correct ? userID: ${userID}`);
+                return exceptions.notFound(res, "user not found !");
+            }
 
-            const deleteUser = await prisma.user.delete(
-                {
-                    where:
-                        { user_id: userID }
+            // Delete the user
+            const deleteUser = await prisma.user.delete({
+                where: {
+                    user_id: userID
                 }
-            );
-            if (!deleteUser) return exceptions.notFound(res, "error when delete user !");
+            });
 
-            // suppression des token d'access
-            res.setHeader('authorization', `Bearer `);
+            // remove access token and clear refresh tooken in cookie for security... 
+            res.setHeader('authorization', ``);
+            res.removeHeader('authorization');
             res.clearCookie(
                 `refresh_key`,
                 {
@@ -227,12 +233,14 @@ const usersControllers = {
                     sameSite: "strict"
                 }
             )
+            log.info(`access token remove and refresh token clear for userID: ${userID}`)
 
             // Return success message
             res
                 .status(HttpCode.OK)
-                .json({ msg: `${deleteUser.name} has been delete successfuly!` })
+                .json({ msg: `${deleteUser.name} has been successfuly deleted!` })
         } catch (error) {
+            log.error(`Error when deleting user!`)
             return exceptions.serverError(res, error);
         }
     },
@@ -383,7 +391,7 @@ const usersControllers = {
         try {
             await prisma.user.deleteMany({ where: { verified: false } });
         } catch (error) {
-            log.error('Failed to delete unverified users', {
+            log.error('Failed to delete unverified users:', {
                 message: error instanceof Error ? error.message : "Unknown error occurred",
             });
             throw new Error(error instanceof Error ? error.message : "Unknow error occured");
