@@ -5,9 +5,12 @@ export interface IUser {
     name: string;
     email: string;
     password: string;
-    otp?: Otp
-    verified: boolean
-    role: RoleUser
+    verified: boolean;
+    role: $Enums.RoleUser;
+    otp: {
+        code: string;
+        expire_at: Date;
+    } | null;
 }
 
 export interface IObjet {
@@ -20,11 +23,6 @@ export interface IObjet {
 
 export interface customRequest extends Request {
     user?: IUser;
-}
-
-export interface Otp {
-    code: string
-    expire_at: Date
 }
 
 export enum RoleUser {

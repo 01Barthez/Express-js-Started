@@ -3,7 +3,7 @@ import exceptions from "../utils/errors/exceptions";
 import prisma from "../core/config/prismaClient";
 import { customRequest, RoleUser } from "../core/interfaces/interfaces";
 
-const roleAdmin = async (
+const roleUser = async (
         req: customRequest, 
         res: Response,
         next: NextFunction,
@@ -27,4 +27,4 @@ const roleAdmin = async (
     }
 }
 
-export default roleAdmin;
+export default roleUser;

@@ -1,3 +1,4 @@
+import log from '@src/core/config/logger';
 import { envs } from '../../../core/config/env';
 import templateManager from './template-manager';
 import transporter from './transporter-config';
@@ -26,10 +27,9 @@ async function sendMail<K extends keyof typeof templateManager>(
 
         // Envoi du message
         await transporter.sendMail(mailOptions)
-        console.log("message successfuly send");
     } catch (error) {
-        console.error(`Error when trying to send mail: ${error}`)
-        throw error;
+        log.error(`Error when trying to send mail: ${error}`)
+        throw new Error(`Failed to send email to new user: ${error}`);
     }
 }
 

@@ -6,9 +6,17 @@ import { customRequest } from "../core/interfaces/interfaces";
 import { HttpCode } from "../core/constant";
 import log from "@src/core/config/logger";
 
-const authUser = async (req: customRequest, res: Response, next: NextFunction):  Promise<void> => {
+const authUser = async (req: customRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const accessToken = req.headers['authorization']?.split(" ")[1] || "";
+        const authHeader = req.headers['authorization'];
+        // log.debug(`authHeader extracted: ${authHeader}`);
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            log.error("Authorization header is malformed !");
+            return exceptions.unauthorized(res, "Malformed token.");
+        }
+        const accessToken = authHeader.replace('Bearer Bearer', 'Bearer').split(" ")[1] || ""; // Because we often have two Bearer world...
+        // log.debug(`Token extracted: ${accessToken}`);
 
         if (accessToken) {
             try {
@@ -24,8 +32,9 @@ const authUser = async (req: customRequest, res: Response, next: NextFunction): 
                     log.error("Access token expired. Trying refresh token...");
                 } else {
                     log.error("Error occured when trying to decode access token...");
-                    throw error; // Si c'est une autre erreur, la propager
                 }
+
+                throw new Error("failed to decode access token !");
             }
         }
 
@@ -60,6 +69,7 @@ const authUser = async (req: customRequest, res: Response, next: NextFunction): 
             httpOnly: envs.JWT_COOKIE_HTTP_STATUS,
             secure: envs.JWT_COOKIE_SECURITY,
             maxAge: envs.JWT_COOKIE_DURATION,
+            sameSite: 'strict',
         });
         log.info("generate new refresh token");
 
@@ -72,12 +82,11 @@ const authUser = async (req: customRequest, res: Response, next: NextFunction): 
         req.user = newUserData;
         return next();
     } catch (error) {
-        console.error(error);
+        log.error(error);
         res
             .status(HttpCode.INTERNAL_SERVER_ERROR)
             .json({ msg: "Authentication error." });
     }
 };
-
 
 export default authUser;

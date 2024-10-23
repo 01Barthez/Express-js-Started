@@ -42,13 +42,15 @@ app.use(
 app.use(cookieParser()); //configuration des cookies (JWT)
 
 // Middleware de journalisation avec Morgan qui utilise Winston
-app.use(morgan('combined', {
+const morganFormatRes = ':method :url  :status :response-time ms' // Format de journalisation 
+app.use(morgan(morganFormatRes, {
 	stream: {
 		write: (message) => log.http(message.trim()) // Redirige les logs HTTP vers Winston
 	}
- }));
+}));
+// app.use(morgan('combined'));
 
-// Routes du programme
+// program routes
 app.use(
 	"/user",
 	rateLimit({

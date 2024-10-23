@@ -1,5 +1,6 @@
 import objetsController from "@src/controllers/objet-controller"
 import authUser from "@src/middleware/authUser"
+// import roleUser from "@src/middleware/roleUser"
 // import upload from "@src/middleware/upload-file"
 import { validate, validator } from "@src/services/validator/validator"
 import ROUTES from "@src/utils/mocks/mocks-routes"
@@ -8,18 +9,6 @@ import { Router } from "express"
 
 const objet: Router = Router()
 
-/**
-*@swagger
-* /{id}
-* get
-*  summary: "Get user objet using id"
-*  description: "enter the id of the ressource to get it"
-* responses: 
-*  200: 
-*   description: [objet]
-*  400: 
-*   description: "ressource not found"
-*/
 objet.get(
     ROUTES.OBJET.GET_ONE_objet,
     objetsController.get_one_objet
@@ -28,7 +17,6 @@ objet.get(
 // Get all objets 
 objet.get(
     ROUTES.OBJET.GET_MANY_objet,
-    // authUser,
     objetsController.get_many_objet
 )
 
@@ -71,7 +59,7 @@ objet.delete(
 objet.delete(
     ROUTES.OBJET.DELETE_MANY_objet,
     authUser,
-    // roleAdmin,
+    // roleUser("admin"),
     objetsController.delete_All_objets
 )
 export default objet;

@@ -1,8 +1,0 @@
-{
-    "watch": ["src"],
-    "ext": "ts",
-    "exec": "ts-node ./src/app.ts",
-    "ignore": ["node_modules"],
-    "delay": "1000"
-  }
-  
